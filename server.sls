@@ -17,7 +17,7 @@ fluentd_install:
   - pkg: fluentd_packages
 
 {%- for plugin in server.get("plugins", []) %}
-fluentd_install_plugin:
+fluentd_install_plugin_{{ plugin }}:
   cmd.run:
   - names:
     -  /usr/lib64/fluent/ruby/bin/fluent-gem install plugin {{ plugin }}
