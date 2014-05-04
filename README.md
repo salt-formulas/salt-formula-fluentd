@@ -13,6 +13,22 @@ Fluentd solves the problem by having: easy installation, small footprint, plugin
 		    plugins:
 		    - fluent-plugin-elasticsearch
 		    - fluent-plugin-mongo
+		    config:
+		    - name: forward
+		      type: input
+		      bind:
+		        port: 24224
+		        host: 0.0.0.0
+		    - name: elasticsearch
+		      type: output
+		      bind:
+		        port: 9200
+		        host: localhost
+		    - name: mongodb
+		      type: output
+		      bind:
+		      	port: localhost
+		      	host: localhost
 
 ## Read more
 

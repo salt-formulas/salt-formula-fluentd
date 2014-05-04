@@ -28,7 +28,7 @@ fluentd_install_plugin_{{ plugin }}:
   - pkg: fluentd_packages
 {% endfor %}
 
-{{ server.config }}:
+{{ server.config_path }}:
   file.managed:
   - source: salt://fluentd/conf/td-agent.conf
   - template: jinja
@@ -40,7 +40,7 @@ fluentd_service:
   - name: {{ server.service }}
   - enable: True
   - watch:
-    - file: {{ server.config }}
+    - file: {{ server.config_path }}
 
 {#
 fluentd_repo:

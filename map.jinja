@@ -3,11 +3,11 @@
     'Debian': {
         'pkgs': ['td-agent'],
         'service': 'td-agent',
-        'config': '/etc/td-agent/td-agent.conf',
+        'config_path': '/etc/td-agent/td-agent.conf',
     },
     'RedHat': {
         'pkgs': ['td-agent'],
         'service': 'td-agent',
-        'config': '/etc/td-agent/td-agent.conf',
+        'config_path': '/etc/td-agent/td-agent.conf',
     },
 }, merge=salt['pillar.get']('fluentd:server')) %}
