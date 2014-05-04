@@ -7,9 +7,12 @@ Fluentd solves the problem by having: easy installation, small footprint, plugin
 
 ### Sample pillar
 
-    fluentd:
-      server:
-        enabled: true
+		fluentd:
+		  server:
+		    enabled: true
+		    plugins:
+		    - fluent-plugin-elasticsearch
+		    - fluent-plugin-mongo
 
 ## Read more
 
