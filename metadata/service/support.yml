@@ -1,0 +1,3 @@
+parameters:
+  fluentd:
+    _support:

@@ -1,0 +1,52 @@
+---
+driver:
+  name: docker
+  hostname: fluentd.ci.local
+  use_sudo: false
+
+provisioner:
+  name: salt_solo
+  salt_install: bootstrap
+  salt_bootstrap_url: https://bootstrap.saltstack.com
+  salt_version: latest
+  require_chef: false
+  log_level: error
+  formula: fluentd
+  grains:
+    noservices: True
+  dependencies:
+    - name: linux
+      repo: git
+      source: https://github.com/salt-formulas/salt-formula-linux.git
+  state_top:
+    base:
+      "*":
+        - linux
+        - fluentd
+  pillars:
+    top.sls:
+      base:
+        "*":
+          - fluentd
+          - repo_tdagent
+  pillars-from-files:
+    repo_tdagent.sls: tests/pillar/repo_tdagent.sls
+
+verifier:
+  name: inspec
+  sudo: true
+
+
+platforms:
+  - name: <%=ENV['PLATFORM'] || 'ubuntu-xenial'%>
+    driver_config:
+      image: <%=ENV['PLATFORM'] || 'trevorj/salty-whales:xenial'%>
+      platform: ubuntu
+
+suites:
+
+  - name: agent
+    provisioner:
+      pillars-from-files:
+        fluentd.sls: tests/pillar/agent.sls
+# vim: ft=yaml sw=2 ts=2 sts=2 tw=125

@@ -1,0 +1,2 @@
+TD_AGENT_USER={{ fluentd.get('user', 'root') }}
+TD_AGENT_GROUP={{ fluentd.get('group', 'root') }}

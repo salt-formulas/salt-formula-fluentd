@@ -1,0 +1,15 @@
+# Openstack services logging
+
+REQUEST_ID req-[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}
+
+DASHLESS_UUID [A-Fa-f0-9]{32}
+
+REQUEST (?:(%{REQUEST_ID:request_id}|)%{SPACE}(%{DASHLESS_UUID:user_id}|)%{SPACE}(%{DASHLESS_UUID:tenant_id}|)%{SPACE}%{DATA})
+
+OPENSTACK_GENERIC (?:%{TIMESTAMP_ISO8601:timestamp}%{SPACE}%{NUMBER:pid}%{SPACE}%{LOGLEVEL:loglevel}%{SPACE}%{NOTSPACE:api}%{SPACE}\[(%{REQUEST})\]%{SPACE}%{GREEDYDATA:message})
+
+KEYSTONE_APACHE_ACCESS (?:%{IPORHOST:clientip} %{USER} %{USER} \[%{HTTPDATE:timestamp}\] "(?:%{WORD:method} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-))
+
+KEYSTONE_APACHE_ERROR (?:%{TIMESTAMP_ISO8601:timestamp}%{SPACE}%{GREEDYDATA:message})
+
+MYSQLERROR (?:%{NUMBER:pid}%{SPACE}%{TIME:timestamp}%{SPACE}%{GREEDYDATA:message})

@@ -1,0 +1,9 @@
+applications:
+  - fluentd
+classes:
+ - service.fluentd.support
+parameters:
+  _param:
+  fluentd:
+    agent:
+      enabled: true

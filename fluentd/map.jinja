@@ -1,0 +1,31 @@
+{% set fluentd = salt['grains.filter_by']({
+  'Debian': {
+    'user': 'root',
+    'group': 'root',
+    'pkgs': ['td-agent', 'build-essential', 'ruby-dev'],
+    'gems': ['fluent-plugin-prometheus', 'fluent-plugin-grok-parser', 'fluent-plugin-systemd'],
+    'gem_path': 'td-agent-gem',
+    'service_name': 'td-agent',
+    'dir': {
+      'config': '/etc/td-agent'
+    },
+    'config': {
+    },
+  },
+}, merge=salt['pillar.get']('fluentd')) %}
+
+{# Collect configuration from */meta/fluentd.yml #}
+{%- set fluentd_grains = {'config': {'input': {}, 'filter': {}, 'match': {}, 'label': {}}} %}
+{%- for service_name, service in pillar.items() %}
+  {%- if service.get('_support', {}).get('fluentd', {}).get('enabled', False) %}
+    {%- set grains_fragment_file = service_name+'/meta/fluentd.yml' %}
+    {%- macro load_grains_file() %}{% include grains_fragment_file ignore missing %}{% endmacro %}
+    {%- set grains_yaml = load_grains_file()|load_yaml %}
+    {%- if grains_yaml is mapping %}
+      {%- set fluentd_grains = salt['grains.filter_by']({'default': fluentd_grains}, merge=grains_yaml) %}
+    {%- endif %}
+  {%- endif %}
+{%- endfor %}
+
+{# Deep-merge the service configuration with the pillar data #}
+{%- do salt['defaults.merge'](fluentd, fluentd_grains) %}
