@@ -3,7 +3,8 @@ applications:
 classes:
  - service.fluentd.support
 parameters:
-  _param:
   fluentd:
     agent:
       enabled: true
+      dir:
+        positiondb: /var/lib/fluentd/positiondb

@@ -1,4 +1,4 @@
-{% set fluentd = salt['grains.filter_by']({
+{% set fluentd_agent = salt['grains.filter_by']({
   'Debian': {
     'user': 'root',
     'group': 'root',
@@ -7,15 +7,16 @@
     'gem_path': 'td-agent-gem',
     'service_name': 'td-agent',
     'dir': {
-      'config': '/etc/td-agent'
+      'config': '/etc/td-agent',
+      'positiondb': '/var/lib/fluentd/positiondb'
     },
     'config': {
     },
   },
-}, merge=salt['pillar.get']('fluentd')) %}
+}, merge=salt['pillar.get']('fluentd:agent')) %}
 
 {# Collect configuration from */meta/fluentd.yml #}
-{%- set fluentd_grains = {'config': {'input': {}, 'filter': {}, 'match': {}, 'label': {}}} %}
+{%- set fluentd_grains = {'agent': {'config': {'input': {}, 'filter': {}, 'match': {}, 'label': {}}}} %}
 {%- for service_name, service in pillar.items() %}
   {%- if service.get('_support', {}).get('fluentd', {}).get('enabled', False) %}
     {%- set grains_fragment_file = service_name+'/meta/fluentd.yml' %}
@@ -28,4 +29,4 @@
 {%- endfor %}
 
 {# Deep-merge the service configuration with the pillar data #}
-{%- do salt['defaults.merge'](fluentd, fluentd_grains) %}
+{%- do salt['defaults.merge'](fluentd_agent, fluentd_grains) %}

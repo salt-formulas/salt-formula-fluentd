@@ -1,20 +1,20 @@
-{% from "fluentd/map.jinja" import fluentd with context %}
-{%- if fluentd.get('enabled', False) %}
+{% from "fluentd/map.jinja" import fluentd_agent with context %}
+{%- if fluentd_agent.get('enabled', False) %}
 
 fluentd_packages_agent:
   pkg.installed:
-    - names: {{ fluentd.pkgs }}
+    - names: {{ fluentd_agent.pkgs }}
 
 fluentd_gems_agent:
   gem.installed:
-    - names: {{ fluentd.gems }}
-    - gem_bin: {{ fluentd.gem_path }}
+    - names: {{ fluentd_agent.gems }}
+    - gem_bin: {{ fluentd_agent.gem_path }}
     - require:
       - pkg: fluentd_packages_agent
 
 fluentd_config_d_dir:
   file.directory:
-    - name: {{ fluentd.dir.config }}/config.d
+    - name: {{ fluentd_agent.dir.config }}/config.d
     - makedirs: True
     - mode: 755
     - require:
@@ -22,10 +22,20 @@ fluentd_config_d_dir:
 
 fluentd_config_d_dir_clean:
   file.directory:
-    - name: {{ fluentd.dir.config }}/config.d
+    - name: {{ fluentd_agent.dir.config }}/config.d
     - clean: True
     - watch_in:
       - service: fluentd_service_agent
+
+fluentd_positiondb_dir:
+  file.directory:
+    - name: {{ fluentd_agent.dir.positiondb }}
+    - user: {{ fluentd_agent.user }}
+    - group: {{ fluentd_agent.group }}
+    - makedirs: True
+    - mode: 755
+    - require:
+      - pkg: fluentd_packages_agent
 
 fluentd_config_service:
   file.managed:
@@ -38,11 +48,11 @@ fluentd_config_service:
     - require:
       - pkg: fluentd_packages_agent
     - context:
-      fluentd: {{ fluentd }}
+      fluentd_agent: {{ fluentd_agent }}
 
 fluentd_config_agent:
   file.managed:
-    - name: {{ fluentd.dir.config }}/td-agent.conf
+    - name: {{ fluentd_agent.dir.config }}/td-agent.conf
     - source: salt://fluentd/files/td-agent.conf
     - user: root
     - group: root
@@ -51,11 +61,11 @@ fluentd_config_agent:
     - require:
       - pkg: fluentd_packages_agent
     - context:
-      fluentd: {{ fluentd }}
+      fluentd_agent: {{ fluentd_agent }}
 
 fluentd_grok_pattern_agent:
   file.managed:
-    - name: {{ fluentd.dir.config }}/config.d/global.grok
+    - name: {{ fluentd_agent.dir.config }}/config.d/global.grok
     - source: salt://fluentd/files/global.grok
     - user: root
     - group: root
@@ -66,14 +76,14 @@ fluentd_grok_pattern_agent:
     - require_in:
       - file: fluentd_config_d_dir_clean
     - context:
-      fluentd: {{ fluentd }}
+      fluentd_agent: {{ fluentd_agent }}
 
-{%- set fluentd_config = fluentd.get('config', {}) %}
+{%- set fluentd_config = fluentd_agent.get('config', {}) %}
 {%- for name,values in fluentd_config.get('input', {}).iteritems() %}
 
 input_{{ name }}_agent:
   file.managed:
-    - name: {{ fluentd.dir.config }}/config.d/input-{{ name }}.conf
+    - name: {{ fluentd_agent.dir.config }}/config.d/input-{{ name }}.conf
     - source:
       - salt://fluentd/files/input/_generate.conf
     - user: root
@@ -101,7 +111,7 @@ input_{{ name }}_agent:
 
 filter_{{ name }}_agent:
   file.managed:
-    - name: {{ fluentd.dir.config }}/config.d/filter-{{ name }}.conf
+    - name: {{ fluentd_agent.dir.config }}/config.d/filter-{{ name }}.conf
     - source:
       - salt://fluentd/files/filter/_generate.conf
     - user: root
@@ -129,7 +139,7 @@ filter_{{ name }}_agent:
 
 match_{{ name }}_agent:
   file.managed:
-    - name: {{ fluentd.dir.config }}/config.d/match-{{ name }}.conf
+    - name: {{ fluentd_agent.dir.config }}/config.d/match-{{ name }}.conf
     - source:
       - salt://fluentd/files/match/_generate.conf
     - user: root
@@ -157,7 +167,7 @@ match_{{ name }}_agent:
 
 label_{{ label_name }}_agent:
   file.managed:
-    - name: {{ fluentd.dir.config }}/config.d/label-{{ label_name }}.conf
+    - name: {{ fluentd_agent.dir.config }}/config.d/label-{{ label_name }}.conf
     - source:
       - salt://fluentd/files/label.conf
     - user: root
@@ -183,12 +193,14 @@ label_{{ label_name }}_agent:
 
 fluentd_service_agent:
   service.running:
-    - name: {{ fluentd.service_name }}
+    - name: {{ fluentd_agent.service_name }}
     - enable: True
     {%- if grains.get('noservices') %}
     - onlyif: /bin/false
     {%- endif %}
     - watch:
       - file: fluentd_config_agent
+    - require:
+      - file: fluentd_positiondb_dir
 
 {%- endif %}
