@@ -20,6 +20,13 @@ fluentd_config_d_dir:
     - require:
       - pkg: fluentd_packages_agent
 
+fluentd_config_d_dir_clean:
+  file.directory:
+    - name: {{ fluentd.dir.config }}/config.d
+    - clean: True
+    - watch_in:
+      - service: fluentd_service_agent
+
 fluentd_config_service:
   file.managed:
     - name: /etc/default/td-agent
@@ -56,6 +63,8 @@ fluentd_grok_pattern_agent:
     - template: jinja
     - require:
       - pkg: fluentd_packages_agent
+    - require_in:
+      - file: fluentd_config_d_dir_clean
     - context:
       fluentd: {{ fluentd }}
 
@@ -74,6 +83,8 @@ input_{{ name }}_agent:
     - require:
       - pkg: fluentd_packages_agent
       - file: fluentd_config_d_dir
+    - require_in:
+      - file: fluentd_config_d_dir_clean
     - watch_in:
       - service: fluentd_service_agent
     - defaults:
@@ -100,6 +111,8 @@ filter_{{ name }}_agent:
     - require:
       - pkg: fluentd_packages_agent
       - file: fluentd_config_d_dir
+    - require_in:
+      - file: fluentd_config_d_dir_clean
     - watch_in:
       - service: fluentd_service_agent
     - defaults:
@@ -126,6 +139,8 @@ match_{{ name }}_agent:
     - require:
       - pkg: fluentd_packages_agent
       - file: fluentd_config_d_dir
+    - require_in:
+      - file: fluentd_config_d_dir_clean
     - watch_in:
       - service: fluentd_service_agent
     - defaults:
@@ -152,6 +167,8 @@ label_{{ label_name }}_agent:
     - require:
       - pkg: fluentd_packages_agent
       - file: fluentd_config_d_dir
+    - require_in:
+      - file: fluentd_config_d_dir_clean
     - watch_in:
       - service: fluentd_service_agent
     - defaults:
