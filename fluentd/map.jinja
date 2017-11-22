@@ -29,4 +29,4 @@
 {%- endfor %}
 
 {# Deep-merge the service configuration with the pillar data #}
-{%- do salt['defaults.merge'](fluentd_agent, fluentd_grains) %}
+{%- do salt['defaults.merge'](fluentd_agent, fluentd_grains.get('agent', {})) %}
