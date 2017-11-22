@@ -1,6 +1,9 @@
 fluentd:
   agent:
     enabled: true
+    plugin:
+      fluent-plugin-elasticsearch:
+        gem: ['fluent-plugin-elasticsearch']
     config:
       label:
         monitoring:
