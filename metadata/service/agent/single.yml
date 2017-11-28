@@ -1,6 +1,7 @@
 applications:
   - fluentd
 classes:
+ - service.fluentd
  - service.fluentd.support
 parameters:
   fluentd:
