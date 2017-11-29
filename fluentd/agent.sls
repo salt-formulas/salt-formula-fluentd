@@ -5,12 +5,22 @@ fluentd_packages_agent:
   pkg.installed:
     - names: {{ fluentd_agent.pkgs }}
 
-fluentd_gems_agent:
+{%- for plugin_name, plugin in fluentd_agent.plugin.iteritems() %}
+  {%- if plugin.get('deb') %}
+fluentd_packages_agent_{{ plugin_name }}:
+  pkg.installed:
+    - names: {{ plugin.get('deb') }}
+    - require:
+      - pkg: fluentd_packages_agent
+  {%- elif plugin.get('gem') %}
+fluentd_gems_agent_{{ plugin_name }}:
   gem.installed:
-    - names: {{ fluentd_agent.gems }}
+    - names: {{ plugin.get('gem') }}
     - gem_bin: {{ fluentd_agent.gem_path }}
     - require:
       - pkg: fluentd_packages_agent
+  {%- endif %}
+{%- endfor %}
 
 fluentd_config_d_dir:
   file.directory:
