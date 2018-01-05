@@ -1,0 +1,19 @@
+{%- from "fluentd/map.jinja" import fluentd_agent with context %}
+{%- if fluentd_agent.get('enabled', False) and fluentd_agent.get('config', {}).get('input', {}).get('prometheus') is defined %}
+server:
+  {%- set fqdn_ip4_addresses = [] %}
+  {%- for addr in grains['fqdn_ip4'] %}
+    {%- if not addr.startswith('127.') %}
+      {%- do fqdn_ip4_addresses.append(addr) %}
+    {%- endif %}
+  {%- endfor %}
+  {%- set address = fqdn_ip4_addresses[0] %}
+  {%- if address is defined %}
+  target:
+    static:
+      fluentd:
+        endpoint:
+          - address: {{ address }}
+            port: 24231
+  {%- endif %}
+{%- endif %}

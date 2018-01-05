@@ -1,4 +1,5 @@
 parameters:
   fluentd:
     _support:
-      enabled: true
+      prometheus:
+        enabled: true
