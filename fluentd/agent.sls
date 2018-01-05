@@ -47,6 +47,24 @@ fluentd_positiondb_dir:
     - require:
       - pkg: fluentd_packages_agent
 
+{%- if grains.get('init') == 'systemd' %}
+
+fluentd_config_service:
+  file.managed:
+    - name: /etc/systemd/system/td-agent.service.d/override.conf
+    - source: salt://fluentd/files/override.conf
+    - makedirs: true
+    - user: root
+    - group: root
+    - mode: 644
+    - template: jinja
+    - require:
+      - pkg: fluentd_packages_agent
+    - context:
+      fluentd_agent: {{ fluentd_agent }}
+
+{%- else %}
+
 fluentd_config_service:
   file.managed:
     - name: /etc/default/td-agent
@@ -59,6 +77,8 @@ fluentd_config_service:
       - pkg: fluentd_packages_agent
     - context:
       fluentd_agent: {{ fluentd_agent }}
+
+{%- endif %}
 
 fluentd_config_agent:
   file.managed:
@@ -210,6 +230,7 @@ fluentd_service_agent:
     {%- endif %}
     - watch:
       - file: fluentd_config_agent
+      - file: fluentd_config_service
     - require:
       - file: fluentd_positiondb_dir
 
