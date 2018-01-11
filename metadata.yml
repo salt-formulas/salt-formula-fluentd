@@ -1,3 +1,6 @@
 name: "fluentd"
 version: "1.0"
 source: "https://github.com/salt-formulas/salt-formula-fluentd"
+dependencies:
+- name: salt
+  source: "https://github.com/salt-formulas/salt-formula-salt"
