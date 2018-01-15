@@ -10,6 +10,6 @@ Vcs-Git: https://github.com/salt-formulas/salt-formula-fluentd.git
 
 Package: salt-formula-fluentd
 Architecture: all
-Depends: ${misc:Depends}, salt-master, reclass
+Depends: ${misc:Depends}
 Description: Fluentd Salt formula
  Install and configure fluentd
