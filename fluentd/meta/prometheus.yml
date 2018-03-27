@@ -15,5 +15,10 @@ server:
         endpoint:
           - address: {{ address }}
             port: 24231
+        relabel_configs:
+          - regex: {{ address }}:24231
+            replacement: {{ grains['host'] }}
+            source_labels: "__address__"
+            target_label: "host"
   {%- endif %}
 {%- endif %}
