@@ -1,2 +1,3 @@
 TD_AGENT_USER={{ fluentd_agent.get('user', 'root') }}
 TD_AGENT_GROUP={{ fluentd_agent.get('group', 'root') }}
+TD_AGENT_OPTIONS="--log-rotate-size {{ fluentd_agent.get('td_agent_log_rotate_size', '10000000') }}"
