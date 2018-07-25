@@ -1,0 +1,28 @@
+classes:
+- service.fluentd.agent.single
+parameters:
+  fluentd:
+    agent:
+      config:
+        label:
+          syslog_output:
+            filter:
+              add_general_fields:
+                tag: "**"
+                type: record_transformer
+                enable_ruby: true
+                record:
+                  - name: Type
+                    value: log
+                  - name: environment_label
+                    value: ${_param:cluster_domain}
+                  - name: Hostname
+                    value: ${fluentd:dollar}{ hostname }
+                  - name: Timestamp
+                    value: ${fluentd:dollar}{ time.strftime('%Y-%m-%dT%H:%M:%S.%N%z') }
+            match:
+              syslog_output:
+                tag: "**"
+                type: syslog
+                host: 127.0.0.1
+                port: 514
