@@ -7,8 +7,9 @@ parameters:
         label:
           default_output:
             match:
-              elasticsearch_output:
+              forward_output:
                 tag: "**"
-                type: elasticsearch
+                type: forward
+                server_name: aggregator
                 host: 127.0.0.1
-                port: 9200
+                port: 24224
