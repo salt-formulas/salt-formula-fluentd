@@ -110,7 +110,7 @@ fluentd_grok_pattern_agent:
 
 {%- set fluentd_config = fluentd_agent.get('config', {}) %}
 {%- for name,values in fluentd_config.get('input', {}).iteritems() %}
-
+{%- if values is not mapping or values.get('enabled', True) %}
 input_{{ name }}_agent:
   file.managed:
     - name: {{ fluentd_agent.dir.config }}/config.d/input-{{ name }}.conf
@@ -129,16 +129,17 @@ input_{{ name }}_agent:
       - service: fluentd_service_agent
     - defaults:
         name: {{ name }}
-{%- if values is mapping %}
+  {%- if values is mapping %}
         values: {{ values | yaml }}
-{%- else %}
+  {%- else %}
         values: {}
+  {%- endif %}
 {%- endif %}
 
 {%- endfor %}
 
 {%- for name,values in fluentd_config.get('filter', {}).iteritems() %}
-
+{%- if values is not mapping or values.get('enabled', True) %}
 filter_{{ name }}_agent:
   file.managed:
     - name: {{ fluentd_agent.dir.config }}/config.d/filter-{{ name }}.conf
@@ -157,16 +158,16 @@ filter_{{ name }}_agent:
       - service: fluentd_service_agent
     - defaults:
         name: {{ name }}
-{%- if values is mapping %}
+  {%- if values is mapping %}
         values: {{ values | yaml }}
-{%- else %}
+  {%- else %}
         values: {}
+  {%- endif %}
 {%- endif %}
-
 {%- endfor %}
 
 {%- for name,values in fluentd_config.get('match', {}).iteritems() %}
-
+{%- if values is not mapping or values.get('enabled', True) %}
 match_{{ name }}_agent:
   file.managed:
     - name: {{ fluentd_agent.dir.config }}/config.d/match-{{ name }}.conf
@@ -185,16 +186,16 @@ match_{{ name }}_agent:
       - service: fluentd_service_agent
     - defaults:
         name: {{ name }}
-{%- if values is mapping %}
+  {%- if values is mapping %}
         values: {{ values | yaml }}
-{%- else %}
+  {%- else %}
         values: {}
+  {%- endif %}
 {%- endif %}
-
 {%- endfor %}
 
 {%- for label_name,values in fluentd_config.get('label', {}).iteritems() %}
-
+{%- if values is not mapping or values.get('enabled', True) %}
 label_{{ label_name }}_agent:
   file.managed:
     - name: {{ fluentd_agent.dir.config }}/config.d/label-{{ label_name }}.conf
@@ -213,12 +214,12 @@ label_{{ label_name }}_agent:
       - service: fluentd_service_agent
     - defaults:
         label_name: {{ label_name }}
-{%- if values is mapping %}
+  {%- if values is mapping %}
         values: {{ values | yaml }}
-{%- else %}
+  {%- else %}
         values: {}
+  {%- endif %}
 {%- endif %}
-
 {%- endfor %}
 
 fluentd_service_agent:
